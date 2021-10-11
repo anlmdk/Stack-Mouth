@@ -17,12 +17,12 @@ public class PlayerTrigger : MonoBehaviour
         if (other.CompareTag(GROW))
         {
             Destroy(other.gameObject);
-            GrowthManager.instance.GrowUp();
+            GrowthManager.instance.Grow();            
         }
         else if (other.CompareTag(SHRINK))
         {
             Destroy(other.gameObject);
-            GrowthManager.instance.GrowDown();
+            GrowthManager.instance.Shrink();
         }
         if (other.CompareTag(FINISH))
         {

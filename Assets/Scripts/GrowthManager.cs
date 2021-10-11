@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class GrowthManager : MonoBehaviour
+public class GrowthManager : MonoBehaviour, ITransformable
 {
     public static GrowthManager instance;
 
@@ -20,7 +20,9 @@ public class GrowthManager : MonoBehaviour
     private float shrinkSpeed = 0.3f;
 
     [SerializeField]
-    private GameObject growingObject;
+    private GameObject growingObject, headObject;
+
+    private float headGrowthTargetConstant, headShrinkTargetConstant;
 
     void Awake()
     {
@@ -33,22 +35,29 @@ public class GrowthManager : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-    public void GrowUp()
+    void Start()
+    {
+        DOTween.Init(true, true, LogBehaviour.Verbose);
+
+        headGrowthTargetConstant = (headObject.transform.localPosition.y - growingObject.transform.localPosition.y) * growthAmount;
+        headShrinkTargetConstant = (headObject.transform.localPosition.y - growingObject.transform.localPosition.y) * shrinkAmount;
+    }
+    public void Grow()
     {
         // When character hit pie or donut
         float totalGrowthAmount = growingObject.transform.localScale.y + growthAmount;
+        float headTargetPosition = headObject.transform.localPosition.y + headGrowthTargetConstant;
 
         growingObject.transform.DOScaleY(totalGrowthAmount, growthSpeed);
-
-        GameObject.Find("Top").GetComponent<Transform>().transform.DOMoveY(totalGrowthAmount - transform.localPosition.y, growthSpeed);
-
+        headObject.transform.DOLocalMoveY(headTargetPosition, growthSpeed);
     }
-    public void GrowDown()
+    public void Shrink()
     {
         // When character hit cactus
         float totalShrinkAmount = growingObject.transform.localScale.y - shrinkAmount;
+        float headTargetPosition = headObject.transform.localPosition.y - headShrinkTargetConstant;
 
-        if (totalShrinkAmount <= 1)
+        if (totalShrinkAmount <= 1 && headTargetPosition <= 1)
         {
             // Game Over
             growingObject.transform.localScale = Vector3.one;
@@ -56,8 +65,7 @@ public class GrowthManager : MonoBehaviour
         else
         {
             growingObject.transform.DOScaleY(totalShrinkAmount, shrinkSpeed);
-
-            GameObject.Find("Top").GetComponent<Transform>().transform.DOMoveY(totalShrinkAmount, shrinkSpeed);
+            headObject.transform.DOLocalMoveY(headTargetPosition, shrinkSpeed);
         }
     }
 }
