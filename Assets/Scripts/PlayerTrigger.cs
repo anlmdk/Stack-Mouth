@@ -24,7 +24,7 @@ public class PlayerTrigger : MonoBehaviour
             Destroy(other.gameObject);
             GrowthManager.instance.Shrink();
         }
-        if (other.CompareTag(FINISH))
+        else if (other.CompareTag(FINISH))
         {
             player.moveSpeed = 0;
             GameObject.Find(THROATS).GetComponent<BoxCollider>().isTrigger = false;
